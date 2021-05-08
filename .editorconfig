@@ -1,0 +1,40 @@
+root = true
+
+[*]
+charset = utf-8 # 文字コード
+end_of_line = lf # 改行文字
+indent_size = 4 # インデントサイズ
+indent_style = space # インデント方式
+insert_final_newline = true # 最終行に空行を入れるか
+max_line_length = off # 1行の最大文字数
+trim_trailing_whitespace = true # 末尾のホワイトスペースを取り除くか
+
+[*.{kt, kts}]
+ij_kotlin_catch_on_new_line = false # catch を新しい行にするか
+ij_kotlin_else_on_new_line = false # else を新しい行にするか
+ij_kotlin_finally_on_new_line = false # finally を新しい行にするか
+ij_kotlin_method_parameters_right_paren_on_new_line = false # 引数の ) を新しい行にするか
+ij_kotlin_space_after_comma = true # , の後ろにスペースを入れるか
+ij_kotlin_space_after_extend_colon = true # 継承の : の後ろにスペースを入れるか
+ij_kotlin_space_after_type_colon = true # 型の : の後ろにスペースを入れるか
+ij_kotlin_space_before_catch_parentheses = true # catchの ( の前にスペースを入れるか
+ij_kotlin_space_before_comma = false # , の前にスペースを入れるか
+ij_kotlin_space_before_extend_colon = false # 継承の : の前にスペースを入れるか
+ij_kotlin_space_before_for_parentheses = true # forの ( の前にスペースを入れるか
+ij_kotlin_space_before_if_parentheses = true # ifの ( の前にスペースを入れるか
+ij_kotlin_space_before_lambda_arrow = true # lambda式の -> の前にスペースを入れるか
+ij_kotlin_space_before_type_colon = false # 型の : の前にスペースを入れるか
+ij_kotlin_space_before_when_parentheses = true # whenの ( の前にスペースを入れるか
+ij_kotlin_space_before_while_parentheses = true # whileの ( の前にスペースを入れるか
+ij_kotlin_while_on_new_line = false # whileを新しい行にするか
+max_line_length = 100 # 1行の最大文字数
+
+[*.xml]
+ij_xml_align_attributes = false # attributeの位置を揃えるか
+ij_xml_keep_indents_on_empty_lines = false # 空行のインデントを保持するか
+ij_xml_space_after_tag_name = false # タグの > の前にスペースを入れるか
+ij_xml_space_around_equals_in_attribute = false # attributeの = の前後にスペースを入れるか
+ij_xml_space_inside_empty_tag = true # タグの /> の前にスペースを入れるか
+
+[/**/{layout/**, AndroidManifest}.xml]
+ij_xml_keep_line_breaks = true # 改行を保持するか
