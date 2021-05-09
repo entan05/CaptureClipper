@@ -103,13 +103,13 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
 
     private fun initView() {
         bind.selectImage.apply {
-            setEmptyLabel("画像を選択")
+            setEmptyLabel(getString(R.string.empty_select_image))
             setOnClickListener {
                 startUpGallery()
             }
         }
 
-        bind.clipImage.setEmptyLabel("加工後画像はまだありません")
+        bind.clipImage.setEmptyLabel(getString(R.string.empty_slipped_image))
 
         bind.saveClipImageButton.setOnClickListener {
             saveImage()
@@ -129,7 +129,7 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
             val bitmap = BitmapFactory.decodeStream(inputStream)
             bind.selectImage.setBitmap(bitmap)
 
-            indicatorView.message = "画像処理中"
+            indicatorView.message = getString(R.string.indicator_image_clipping)
             showIndicator()
             otherHandler.post {
                 val clipImage = clipImage(bitmap)
@@ -182,7 +182,7 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
     }
 
     private fun saveImage() {
-        indicatorView.message = "保存処理中"
+        indicatorView.message = getString(R.string.indicator_image_saving)
         showIndicator()
 
         val outputBitmap = bind.clipImage.getBitmap()
@@ -228,7 +228,7 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
     private fun getSaveImageName(): String {
         val calendar = Calendar.getInstance()
         return String.format(
-            "clipImage_%04d%02d%02d-%02d%02d%02d.png",
+            getString(R.string.file_name_format),
             calendar.year, calendar.month + 1, calendar.date,
             calendar.hourOfDay, calendar.minute, calendar.second
         )

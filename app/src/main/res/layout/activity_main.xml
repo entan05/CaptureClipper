@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/eLib_margin_8dp"
             android:layout_marginTop="@dimen/eLib_margin_8dp"
-            android:text="選択画像"
+            android:text="@string/select_image_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/eLib_margin_8dp"
             android:layout_marginTop="@dimen/eLib_margin_8dp"
-            android:text="加工後画像"
+            android:text="@string/clipped_image_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/center_guideline" />
 
@@ -78,7 +78,7 @@
         android:layout_marginHorizontal="@dimen/eLib_margin_8dp"
         android:layout_marginBottom="@dimen/eLib_margin_8dp"
         android:enabled="false"
-        android:text="画像を保存"
+        android:text="@string/save_image"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

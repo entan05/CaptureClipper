@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">CaptureClipper</string>
+
+    <string name="select_image_label">選択画像</string>
+    <string name="clipped_image_label">加工後画像</string>
+    <string name="save_image">画像を保存</string>
+
+    <string name="empty_select_image">画像を選択</string>
+    <string name="empty_slipped_image">加工後画像はまだありません</string>
+
+    <string name="indicator_image_clipping">画像処理中</string>
+    <string name="indicator_image_saving">保存処理中</string>
+
+    <string name="file_name_format">clipImage_%04d%02d%02d-%02d%02d%02d.png</string>
 </resources>
