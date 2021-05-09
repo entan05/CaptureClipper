@@ -2,6 +2,7 @@ package jp.team.ework.captureclipper
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,13 +13,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
+import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import jp.team.ework.captureclipper.databinding.ActivityMainBinding
+import jp.team.ework.captureclipper.extension.*
 import jp.team.eworks.e_core_library.activity.IndicatorActivity
 import jp.team.eworks.e_core_library.view.IndicatorView
 import java.io.BufferedInputStream
 import java.io.FileNotFoundException
+import java.util.*
 import kotlin.math.abs
 
 class MainActivity: IndicatorActivity<IndicatorView>() {
@@ -30,6 +34,8 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
+
+        private const val IMAGE_MIME_TYPE = "image/png"
     }
 
     private val bind by activityBinding<ActivityMainBinding>()
@@ -86,13 +92,18 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
                 startUpGallery()
             }
         }
+
         bind.clipImage.setEmptyLabel("加工後画像はまだありません")
+
+        bind.saveClipImageButton.setOnClickListener {
+            saveImage()
+        }
     }
 
     private fun startUpGallery() {
         startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "image/png"
+            type = IMAGE_MIME_TYPE
         }, REQUEST_GALLERY)
     }
 
@@ -108,6 +119,7 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
                 val clipImage = clipImage(bitmap)
                 mainHandler.post {
                     bind.clipImage.setBitmap(clipImage)
+                    bind.saveClipImageButton.isEnabled = true
                     hideIndicator()
                 }
             }
@@ -150,6 +162,59 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
             abs(endY - startY),
             null,
             true
+        )
+    }
+
+    private fun saveImage() {
+        indicatorView.message = "保存処理中"
+        showIndicator()
+
+        val outputBitmap = bind.clipImage.getBitmap()
+
+        otherHandler.post {
+            val values = ContentValues().apply {
+                // ファイル名
+                put(MediaStore.Images.Media.DISPLAY_NAME, getSaveImageName())
+                // mime type
+                put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME_TYPE)
+                // 排他アクセス
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+
+            val contentUri =
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            val resolver = applicationContext.contentResolver
+            val insertItem = resolver.insert(contentUri, values)
+
+            if (insertItem != null && outputBitmap != null) {
+                try {
+                    val outputStream = contentResolver.openOutputStream(insertItem)
+                    outputBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                } catch (e: FileNotFoundException) {
+
+                }
+                values.apply {
+                    clear()
+                    put(MediaStore.Images.Media.IS_PENDING, 0)
+                }
+                resolver.update(insertItem, values, null, null)
+            }
+
+            mainHandler.post {
+                bind.selectImage.clear()
+                bind.clipImage.clear()
+                bind.saveClipImageButton.isEnabled = false
+                hideIndicator()
+            }
+        }
+    }
+
+    private fun getSaveImageName(): String {
+        val calendar = Calendar.getInstance()
+        return String.format(
+            "clipImage_%04d%02d%02d-%02d%02d%02d.png",
+            calendar.year, calendar.month + 1, calendar.date,
+            calendar.hourOfDay, calendar.minute, calendar.second
         )
     }
 }
