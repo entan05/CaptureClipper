@@ -72,12 +72,28 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
 
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_STORAGE_PERMISSION -> initView()
-
                 REQUEST_GALLERY -> {
                     data?.data?.let { uri ->
                         openImage(uri)
                     }
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            REQUEST_STORAGE_PERMISSION -> {
+                if ((grantResults.isNotEmpty() &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    initView()
+                } else {
+                    finish()
                 }
             }
         }
