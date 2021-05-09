@@ -4,9 +4,14 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import jp.team.ework.captureclipper.databinding.ActivityMainBinding
@@ -14,6 +19,7 @@ import jp.team.eworks.e_core_library.activity.IndicatorActivity
 import jp.team.eworks.e_core_library.view.IndicatorView
 import java.io.BufferedInputStream
 import java.io.FileNotFoundException
+import kotlin.math.abs
 
 class MainActivity: IndicatorActivity<IndicatorView>() {
     companion object {
@@ -27,6 +33,16 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
     }
 
     private val bind by activityBinding<ActivityMainBinding>()
+
+    private val mainHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
+    private val otherHandler: Handler by lazy {
+        val handlerThread = HandlerThread("other thread")
+        handlerThread.start()
+        Handler(handlerThread.looper)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,9 +80,13 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
     override fun createIndicatorView(): IndicatorView = IndicatorView(this)
 
     private fun initView() {
-        bind.choseImageButton.setOnClickListener {
-            startUpGallery()
+        bind.selectImage.apply {
+            setEmptyLabel("画像を選択")
+            setOnClickListener {
+                startUpGallery()
+            }
         }
+        bind.clipImage.setEmptyLabel("加工後画像はまだありません")
     }
 
     private fun startUpGallery() {
@@ -80,9 +100,56 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
         try {
             val inputStream = BufferedInputStream(contentResolver.openInputStream(uri))
             val bitmap = BitmapFactory.decodeStream(inputStream)
-            bind.imageView.setImageBitmap(bitmap)
+            bind.selectImage.setBitmap(bitmap)
+
+            indicatorView.message = "画像処理中"
+            showIndicator()
+            otherHandler.post {
+                val clipImage = clipImage(bitmap)
+                mainHandler.post {
+                    bind.clipImage.setBitmap(clipImage)
+                    hideIndicator()
+                }
+            }
         } catch (e: FileNotFoundException) {
 
         }
+    }
+
+    private fun clipImage(bitmap: Bitmap): Bitmap {
+        val cBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+
+        val originWidth = cBitmap.width
+        val originHeight = cBitmap.height
+        // pxの取得
+        val pixels = IntArray(originWidth * originHeight)
+        cBitmap.getPixels(pixels, 0, originWidth, 0, 0, originWidth, originHeight)
+
+        var startX = originWidth
+        var startY = originHeight
+        var endX = 0
+        var endY = 0
+        for (y in 0 until originHeight) {
+            for (x in 0 until originWidth) {
+                val px = pixels[x + (y * originWidth)]
+
+                if (px != Color.BLACK) {
+                    if (x < startX) startX = x
+                    if (y < startY) startY = y
+                    if (x > endX) endX = x
+                    if (y > endY) endY = y
+                }
+            }
+        }
+
+        return Bitmap.createBitmap(
+            bitmap,
+            startX,
+            startY,
+            abs(endX - startX),
+            abs(endY - startY),
+            null,
+            true
+        )
     }
 }
