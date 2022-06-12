@@ -16,6 +16,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import jp.team.ework.binarization.binarization
 import jp.team.ework.captureclipper.databinding.ActivityMainBinding
 import jp.team.ework.captureclipper.extension.*
 import jp.team.eworks.e_core_library.activity.IndicatorActivity
@@ -102,6 +103,23 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
     override fun createIndicatorView(): IndicatorView = IndicatorView(this)
 
     private fun initView() {
+        bind.retry.setOnClickListener {
+            bind.selectImage.getBitmap()?.let { bitmap ->
+                indicatorView.message = getString(R.string.indicator_image_clipping)
+                showIndicator()
+
+                val threshold = bind.threshold.value.toInt()
+                otherHandler.post {
+                    val clipImage = clipImage(bitmap, threshold)
+                    mainHandler.post {
+                        bind.clipImage.setBitmap(clipImage)
+                        bind.saveClipImageButton.isEnabled = true
+                        hideIndicator()
+                    }
+                }
+            }
+        }
+
         bind.selectImage.apply {
             setEmptyLabel(getString(R.string.empty_select_image))
             setOnClickListener {
@@ -131,8 +149,9 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
 
             indicatorView.message = getString(R.string.indicator_image_clipping)
             showIndicator()
+            val threshold = bind.threshold.value.toInt()
             otherHandler.post {
-                val clipImage = clipImage(bitmap)
+                val clipImage = clipImage(bitmap, threshold)
                 mainHandler.post {
                     bind.clipImage.setBitmap(clipImage)
                     bind.saveClipImageButton.isEnabled = true
@@ -144,8 +163,8 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
         }
     }
 
-    private fun clipImage(bitmap: Bitmap): Bitmap {
-        val cBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+    private fun clipImage(bitmap: Bitmap, threshold: Int): Bitmap {
+        val cBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true).binarization(threshold)
 
         val originWidth = cBitmap.width
         val originHeight = cBitmap.height
@@ -168,6 +187,14 @@ class MainActivity: IndicatorActivity<IndicatorView>() {
                     if (y > endY) endY = y
                 }
             }
+        }
+        if (startX == originWidth && endX == 0) {
+            startX = 0
+            endX = originWidth
+        }
+        if (startY == originHeight && endY == 0) {
+            startY = 0
+            endY = originHeight
         }
 
         return Bitmap.createBitmap(

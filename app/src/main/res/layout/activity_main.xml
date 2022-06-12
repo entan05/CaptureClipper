@@ -8,11 +8,44 @@
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/setting_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/threshold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/eLib_margin_8dp"
+            android:layout_marginEnd="@dimen/eLib_margin_8dp"
+            android:value="128"
+            android:valueFrom="0"
+            android:valueTo="255"
+            app:labelBehavior="gone"
+            app:layout_constraintEnd_toStartOf="@id/retry"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/retry"
+            style="@style/eLib.text.Headline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/eLib_margin_8dp"
+            android:text="▶︎"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/eLib_margin_8dp"
         app:layout_constraintBottom_toTopOf="@id/save_clip_image_button"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/setting_container">
 
         <TextView
             android:id="@+id/select_image_label"
