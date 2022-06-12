@@ -39,7 +39,9 @@ dependencies {
     // Core Libraries
     implementation "com.github.entan05:eLibraries:v0.0.3"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation("com.github.entan05.BitmapExtensions:binarization:0.0.1")
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.31"
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
